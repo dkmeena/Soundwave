@@ -7,10 +7,13 @@ import android.media.AudioTrack;
 import android.media.ToneGenerator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.util.logging.Handler;
 
 public class Soundwave extends AppCompatActivity {
 
@@ -21,52 +24,126 @@ public class Soundwave extends AppCompatActivity {
         Button button = (Button) findViewById(R.id.button);
         final EditText name = (EditText) findViewById(R.id.editText);
 
+        final int duration = 3; // seconds
+        final int sampleRate = 44100;
+        final int numSamples = 44100; //duration * samplerate
+        final double sample[] = new double[numSamples];
+        final double sample2[] = new double[numSamples];
+
+        final double freqOfTone = 19000; // hz
+        final double freqOfTone2 = 20300; // hz
+
+        final byte generatedSnd[] = new byte[2 * numSamples];
+        final byte generatedSnd2[] = new byte[2 * numSamples];
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Context context = getApplicationContext();
+                // fill out the array
                 int biname = Integer.parseInt(name.getText().toString());
-
                 String biname1 = Integer.toBinaryString(biname);
                 int length = biname1.length();
-                ToneGenerator toneG1 = new ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME);
-                //ToneGenerator toneG2 = new ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME);
-
-//                toneG1.startTone(ToneGenerator.TONE_DTMF_B);
-//                try {
-//                    Thread.sleep(600);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-                toneG1.stopTone();
-                for(int i=0;i<length;i++) {
-                    if (biname1.charAt(i)== '1'){
-                        toneG1.startTone(ToneGenerator.TONE_DTMF_6);
-                        //int a =toneG1.getAudioSessionId();
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        toneG1.stopTone();
-                    }
-                    else {
-                        toneG1.startTone(ToneGenerator.TONE_CDMA_DIAL_TONE_LITE);
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        toneG1.stopTone();
-                    }
+                Log.d("myTag", biname1);
+                for (int i = 0; i < numSamples; ++i) {
+                    sample[i] = 1000*Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone));
+                    sample2[i] = 100*Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone2));
                 }
-//                toneG1.startTone(ToneGenerator.TONE_DTMF_B);
+
+                // convert to 16 bit pcm sound array
+                // assumes the sample buffer is normalised.
+                int idx = 0;
+                for (double dVal : sample) {
+                    short val = (short) (dVal * 32767);
+                    generatedSnd[idx++] = (byte) (val & 0x00ff);
+                    generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+
+                }
+
+                int idx2 = 0;
+                for (double dVal2 : sample2) {
+                    short val2 = (short) (dVal2 * 32767);
+                    generatedSnd2[idx2++] = (byte) (val2 & 0x00ff);
+                    generatedSnd2[idx2++] = (byte) ((val2 & 0xff00) >>> 8);
+
+                }
+
+
+                //Log.d("myTag", String.valueOf(length));
+//begin
+                AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                        44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT, numSamples,
+                        AudioTrack.MODE_STATIC);
+                audioTrack.write(generatedSnd, 0, numSamples);
+//                audioTrack.play();
 //                try {
-//                    Thread.sleep(600);
+//                    Thread.sleep(550);
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
-//                toneG1.stopTone();
+//
+
+                AudioTrack audioTrack2 = new AudioTrack(AudioManager.STREAM_MUSIC,
+                        44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT, numSamples,
+                        AudioTrack.MODE_STATIC);
+                audioTrack2.write(generatedSnd2, 0, numSamples);
+
+
+                for(int i=0; i<length; i++)
+                {
+                    if (biname1.charAt(i)== '1'){
+                        audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                                44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                                AudioFormat.ENCODING_PCM_16BIT, numSamples,
+                                AudioTrack.MODE_STATIC);
+                        audioTrack.write(generatedSnd, 0, numSamples);
+                        audioTrack.play();
+                        try {
+
+                                Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        audioTrack.stop();
+                    }
+                    else{
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                    audioTrack.stop();
+
+                    audioTrack2 = new AudioTrack(AudioManager.STREAM_MUSIC,
+                            44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                            AudioFormat.ENCODING_PCM_16BIT, numSamples,
+                            AudioTrack.MODE_STATIC);
+                    audioTrack2.write(generatedSnd2, 0, numSamples);
+                    audioTrack2.play();
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    audioTrack2.stop();
+                }
+//end
+//                audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+//                        44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+//                        AudioFormat.ENCODING_PCM_16BIT, numSamples,
+//                        AudioTrack.MODE_STATIC);
+//                audioTrack.write(generatedSnd, 0, numSamples);
+//                audioTrack.play();
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//end
 
             }
         });
