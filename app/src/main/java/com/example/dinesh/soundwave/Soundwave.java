@@ -70,11 +70,11 @@ public class Soundwave extends AppCompatActivity {
 
                 //Log.d("myTag", String.valueOf(length));
 //begin
-                AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-                        44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT, numSamples,
-                        AudioTrack.MODE_STATIC);
-                audioTrack.write(generatedSnd, 0, numSamples);
+//                AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+//                        44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+//                        AudioFormat.ENCODING_PCM_16BIT, numSamples,
+//                        AudioTrack.MODE_STATIC);
+//                audioTrack.write(generatedSnd, 0, numSamples);
 //                audioTrack.play();
 //                try {
 //                    Thread.sleep(550);
@@ -93,7 +93,7 @@ public class Soundwave extends AppCompatActivity {
                 for(int i=0; i<length; i++)
                 {
                     if (biname1.charAt(i)== '1'){
-                        audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                       AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                                 44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
                                 AudioFormat.ENCODING_PCM_16BIT, numSamples,
                                 AudioTrack.MODE_STATIC);
@@ -106,6 +106,8 @@ public class Soundwave extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         audioTrack.stop();
+                        audioTrack.release();
+
                     }
                     else{
                         try {
@@ -115,8 +117,6 @@ public class Soundwave extends AppCompatActivity {
                         }
 
                     }
-
-                    audioTrack.stop();
 
                     audioTrack2 = new AudioTrack(AudioManager.STREAM_MUSIC,
                             44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
@@ -130,19 +130,21 @@ public class Soundwave extends AppCompatActivity {
                         e.printStackTrace();
                     }
                     audioTrack2.stop();
+                    audioTrack2.release();
                 }
 //end
-//                audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-//                        44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-//                        AudioFormat.ENCODING_PCM_16BIT, numSamples,
-//                        AudioTrack.MODE_STATIC);
-//                audioTrack.write(generatedSnd, 0, numSamples);
-//                audioTrack.play();
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
+                AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                        44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT, numSamples,
+                       AudioTrack.MODE_STATIC);
+               audioTrack.write(generatedSnd2, 0, numSamples);
+               audioTrack.play();
+               try {
+                   Thread.sleep(800);
+               } catch (InterruptedException e) {
+                   e.printStackTrace();
+               }
+                audioTrack.release();
 //end
 
             }
