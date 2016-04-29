@@ -40,35 +40,42 @@ public class Soundwave extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // fill out the array
-                int biname = Integer.parseInt(name.getText().toString());
-                String biname1 = Integer.toBinaryString(biname);
-                int length = biname1.length();
-                Log.d("myTag", biname1);
-                for (int i = 0; i < numSamples; ++i) {
-                    sample[i] = 1000*Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone));
-                    sample2[i] = 100*Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone2));
-                }
+                String strcode = name.getText().toString();
+                if (strcode.trim().length() == 0|null==strcode) {
+                    name.setError("cannot be empty");}
 
-                // convert to 16 bit pcm sound array
-                // assumes the sample buffer is normalised.
-                int idx = 0;
-                for (double dVal : sample) {
-                    short val = (short) (dVal * 32767);
-                    generatedSnd[idx++] = (byte) (val & 0x00ff);
-                    generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-
-                }
-
-                int idx2 = 0;
-                for (double dVal2 : sample2) {
-                    short val2 = (short) (dVal2 * 32767);
-                    generatedSnd2[idx2++] = (byte) (val2 & 0x00ff);
-                    generatedSnd2[idx2++] = (byte) ((val2 & 0xff00) >>> 8);
-
-                }
+                else {
+                    int biname = Integer.parseInt(name.getText().toString());
 
 
-                //Log.d("myTag", String.valueOf(length));
+                    String biname1 = Integer.toBinaryString(biname);
+                    int length = biname1.length();
+                    Log.d("myTag", biname1);
+                    for (int i = 0; i < numSamples; ++i) {
+                        sample[i] = 1000 * Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone));
+                        sample2[i] = 100 * Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone2));
+                    }
+
+                    // convert to 16 bit pcm sound array
+                    // assumes the sample buffer is normalised.
+                    int idx = 0;
+                    for (double dVal : sample) {
+                        short val = (short) (dVal * 32767);
+                        generatedSnd[idx++] = (byte) (val & 0x00ff);
+                        generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+
+                    }
+
+                    int idx2 = 0;
+                    for (double dVal2 : sample2) {
+                        short val2 = (short) (dVal2 * 32767);
+                        generatedSnd2[idx2++] = (byte) (val2 & 0x00ff);
+                        generatedSnd2[idx2++] = (byte) ((val2 & 0xff00) >>> 8);
+
+                    }
+
+
+                    //Log.d("myTag", String.valueOf(length));
 //begin
 //                AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
 //                        44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
@@ -83,72 +90,71 @@ public class Soundwave extends AppCompatActivity {
 //                }
 //
 
-                AudioTrack audioTrack2 = new AudioTrack(AudioManager.STREAM_MUSIC,
-                        44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT, numSamples,
-                        AudioTrack.MODE_STATIC);
-                audioTrack2.write(generatedSnd2, 0, numSamples);
-
-
-                for(int i=0; i<length; i++)
-                {
-                    if (biname1.charAt(i)== '1'){
-                       AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-                                44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                                AudioFormat.ENCODING_PCM_16BIT, numSamples,
-                                AudioTrack.MODE_STATIC);
-                        audioTrack.write(generatedSnd, 0, numSamples);
-                        audioTrack.play();
-                        try {
-
-                                Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        audioTrack.stop();
-                        audioTrack.release();
-
-                    }
-                    else{
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                    audioTrack2 = new AudioTrack(AudioManager.STREAM_MUSIC,
+                    AudioTrack audioTrack2 = new AudioTrack(AudioManager.STREAM_MUSIC,
                             44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
                             AudioFormat.ENCODING_PCM_16BIT, numSamples,
                             AudioTrack.MODE_STATIC);
                     audioTrack2.write(generatedSnd2, 0, numSamples);
-                    audioTrack2.play();
+
+
+                    for (int i = 0; i < length; i++) {
+                        if (biname1.charAt(i) == '1') {
+                            AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                                    44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                                    AudioFormat.ENCODING_PCM_16BIT, numSamples,
+                                    AudioTrack.MODE_STATIC);
+                            audioTrack.write(generatedSnd, 0, numSamples);
+                            audioTrack.play();
+                            try {
+
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            audioTrack.stop();
+                            audioTrack.release();
+
+                        } else {
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                        audioTrack2 = new AudioTrack(AudioManager.STREAM_MUSIC,
+                                44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                                AudioFormat.ENCODING_PCM_16BIT, numSamples,
+                                AudioTrack.MODE_STATIC);
+                        audioTrack2.write(generatedSnd2, 0, numSamples);
+                        audioTrack2.play();
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        audioTrack2.stop();
+                        audioTrack2.release();
+                    }
+//end
+                    AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                            44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                            AudioFormat.ENCODING_PCM_16BIT, numSamples,
+                            AudioTrack.MODE_STATIC);
+                    audioTrack.write(generatedSnd2, 0, numSamples);
+                    audioTrack.play();
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(800);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    audioTrack2.stop();
-                    audioTrack2.release();
+                    audioTrack.release();
+//end
                 }
-//end
-                AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-                        44100, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT, numSamples,
-                       AudioTrack.MODE_STATIC);
-               audioTrack.write(generatedSnd2, 0, numSamples);
-               audioTrack.play();
-               try {
-                   Thread.sleep(800);
-               } catch (InterruptedException e) {
-                   e.printStackTrace();
-               }
-                audioTrack.release();
-//end
-
             }
         });
 
     }
 }
+
